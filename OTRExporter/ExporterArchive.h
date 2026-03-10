@@ -7,7 +7,6 @@
 #include <unordered_map>
 #include <memory>
 #include <mutex>
-#include <StormLib.h>
 
 class ExporterArchive : public std::enable_shared_from_this<ExporterArchive> {
   public:

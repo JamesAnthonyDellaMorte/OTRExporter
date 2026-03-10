@@ -71,6 +71,11 @@ set(ALL_FILES
     ${Source_Files}
 )
 
+set(OTR_ZAPD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../ZAPDTR/ZAPD")
+if(DEFINED MOONWRIGHT_ZAPD_SOURCE_DIR)
+    set(OTR_ZAPD_INCLUDE_DIR "${MOONWRIGHT_ZAPD_SOURCE_DIR}")
+endif()
+
 ################################################################################
 # Target
 ################################################################################
@@ -137,7 +142,7 @@ endif()
 ################################################################################
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-	${CMAKE_CURRENT_SOURCE_DIR}/../../ZAPDTR/ZAPD/
+	${OTR_ZAPD_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../libultraship/include
     # TODO: these should no longer be necessary if we were to link against LUS
     ${CMAKE_CURRENT_SOURCE_DIR}/../../libultraship
@@ -154,13 +159,15 @@ target_link_libraries(${PROJECT_NAME} PUBLIC nlohmann_json::nlohmann_json)
 find_package(spdlog REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
 
-FetchContent_Declare(
-    StormLib
-    GIT_REPOSITORY https://github.com/ladislav-zezula/StormLib.git
-    GIT_TAG v9.25
-)
-FetchContent_MakeAvailable(StormLib)
-target_include_directories(${PROJECT_NAME} PRIVATE ${stormlib_SOURCE_DIR}/src)
+if(INCLUDE_MPQ_SUPPORT)
+    FetchContent_Declare(
+        StormLib
+        GIT_REPOSITORY https://github.com/ladislav-zezula/StormLib.git
+        GIT_TAG v9.25
+    )
+    FetchContent_MakeAvailable(StormLib)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${stormlib_SOURCE_DIR}/src)
+endif()
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE

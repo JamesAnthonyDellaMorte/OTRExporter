@@ -208,6 +208,7 @@ static void ExporterProgramEnd()
     {
         size_t filenameSepAt = item.find_last_of("/\\");
         const std::string filename = item.substr(filenameSepAt + 1);
+        const std::string relativePath = StringHelper::Split(item, customAssetsPath)[1];
 
         if (std::count(filename.begin(), filename.end(), '.') >= 2)
         {
@@ -237,6 +238,26 @@ static void ExporterProgramEnd()
 
                 std::vector<char> fileData = stream->ToVector();
                 dataVec.push_back({ fileData, StringHelper::Split(afterPath, customAssetsPath)[1], fileData.size() });
+                continue;
+            }
+        }
+
+        if (relativePath.rfind("runtime/rom/", 0) == 0)
+        {
+            size_t extensionSepAt = filename.find_last_of(".");
+            const std::string extension = extensionSepAt == std::string::npos ? "" : filename.substr(extensionSepAt + 1);
+
+            if (extension == "bin" || extension == "seq")
+            {
+                ZBlob* blob = ZBlob::FromFile(item);
+                OTRExporter_Blob exporter;
+
+                MemoryStream* stream = new MemoryStream();
+                BinaryWriter writer(stream);
+                exporter.Save(blob, "", &writer);
+
+                std::vector<char> fileData = stream->ToVector();
+                dataVec.push_back({ fileData, relativePath, fileData.size() });
                 continue;
             }
         }
