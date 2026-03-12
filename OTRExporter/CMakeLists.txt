@@ -72,8 +72,8 @@ set(ALL_FILES
 )
 
 set(OTR_ZAPD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../ZAPDTR/ZAPD")
-if(DEFINED MOONWRIGHT_ZAPD_SOURCE_DIR)
-    set(OTR_ZAPD_INCLUDE_DIR "${MOONWRIGHT_ZAPD_SOURCE_DIR}")
+if(DEFINED BLUEFEATHER_ZAPD_SOURCE_DIR)
+    set(OTR_ZAPD_INCLUDE_DIR "${BLUEFEATHER_ZAPD_SOURCE_DIR}")
 endif()
 
 ################################################################################
