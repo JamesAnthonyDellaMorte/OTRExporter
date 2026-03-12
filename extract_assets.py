@@ -8,11 +8,14 @@ import struct
 import subprocess
 import argparse
 
-def BuildOTR(xmlRoot, xmlVersion, rom, isMM, zapd_exe=None, genHeaders=None, customAssetsPath=None, customOtrFile=None, portVer=None):
-    if not zapd_exe:
-        zapd_exe = "x64\\Release\\ZAPD.exe" if sys.platform == "win32" else "../ZAPDTR/ZAPD.out"
+def get_default_asset_tool_executable():
+    return "x64\\Release\\ZAPD.exe" if sys.platform == "win32" else "../ZAPDTR/ZAPD.out"
+
+def BuildOTR(xmlRoot, xmlVersion, rom, isMM, asset_tool_exe=None, genHeaders=None, customAssetsPath=None, customOtrFile=None, portVer=None):
+    if not asset_tool_exe:
+        asset_tool_exe = get_default_asset_tool_executable()
     xmlPath = os.path.join(xmlRoot, xmlVersion)
-    exec_cmd = [zapd_exe, "ed", "-i", xmlPath, "-b", rom, "-fl", "assets/extractor/filelists",
+    exec_cmd = [asset_tool_exe, "ed", "-i", xmlPath, "-b", rom, "-fl", "assets/extractor/filelists",
                 "-o", "placeholder", "-osf", "placeholder", "-rconf"]
     configFileStr = "assets/extractor/Config_" + xmlVersion + ".xml"
     exec_cmd.extend([configFileStr])
@@ -42,9 +45,9 @@ def BuildOTR(xmlRoot, xmlVersion, rom, isMM, zapd_exe=None, genHeaders=None, cus
         print("Aborting...", file=os.sys.stderr)
         print("\n")
 
-def BuildCustomOtr(zapd_exe=None, assets_path=None, otrfile=None, portVer=None):
-    if not zapd_exe:
-        zapd_exe = "x64\\Release\\ZAPD.exe" if sys.platform == "win32" else "../ZAPDTR/ZAPD.out"
+def BuildCustomOtr(asset_tool_exe=None, assets_path=None, otrfile=None, portVer=None):
+    if not asset_tool_exe:
+        asset_tool_exe = get_default_asset_tool_executable()
 
     if not assets_path or not otrfile:
         print("\n")
@@ -52,7 +55,7 @@ def BuildCustomOtr(zapd_exe=None, assets_path=None, otrfile=None, portVer=None):
         print("\n")
         return
 
-    exec_cmd = [zapd_exe, "botr", "-se", "OTR", "--norom", "--customAssetsPath", assets_path, "--customOtrFile", otrfile]
+    exec_cmd = [asset_tool_exe, "botr", "-se", "OTR", "--norom", "--customAssetsPath", assets_path, "--customOtrFile", otrfile]
 
     if portVer:
         exec_cmd.extend(["--portVer", portVer])
@@ -67,7 +70,7 @@ def BuildCustomOtr(zapd_exe=None, assets_path=None, otrfile=None, portVer=None):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-z", "--zapd", help="Path to ZAPD executable", dest="zapd_exe", type=str)
+    parser.add_argument("-z", "--asset-tool", "--zapd", help="Path to the asset tool executable", dest="asset_tool_exe", type=str)
     parser.add_argument("rom", help="Path to the rom", type=str, nargs="?")
     parser.add_argument("--non-interactive", help="Runs the script non-interactively for use in build scripts.", dest="non_interactive", action="store_true")
     parser.add_argument("-v", "--verbose", help="Display rom's header checksums and their corresponding xml folder", dest="verbose", action="store_true")
@@ -81,12 +84,12 @@ def main():
     args = parser.parse_args()
 
     if args.norom:
-        BuildCustomOtr(args.zapd_exe, args.custom_assets_path, args.custom_otr_file, portVer=args.port_ver)
+        BuildCustomOtr(args.asset_tool_exe, args.custom_assets_path, args.custom_otr_file, portVer=args.port_ver)
         return
 
     roms = [ Z64Rom(args.rom) ] if args.rom else rom_chooser.chooseROM(args.verbose, args.non_interactive)
     for rom in roms:
-        BuildOTR(args.xml_root, rom.version.xml_ver, rom.file_path, rom.version.is_mm, zapd_exe=args.zapd_exe, genHeaders=args.gen_headers,
+        BuildOTR(args.xml_root, rom.version.xml_ver, rom.file_path, rom.version.is_mm, asset_tool_exe=args.asset_tool_exe, genHeaders=args.gen_headers,
                  customAssetsPath=args.custom_assets_path, customOtrFile=args.custom_otr_file, portVer=args.port_ver)
 
 if __name__ == "__main__":
