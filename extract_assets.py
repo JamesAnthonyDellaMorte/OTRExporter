@@ -9,7 +9,7 @@ import subprocess
 import argparse
 
 def get_default_asset_tool_executable():
-    return "x64\\Release\\ZAPD.exe" if sys.platform == "win32" else "../ZAPDTR/ZAPD.out"
+    return "ZAPD.exe" if sys.platform == "win32" else "ZAPD.out"
 
 def BuildOTR(xmlRoot, xmlVersion, rom, isMM, asset_tool_exe=None, genHeaders=None, customAssetsPath=None, customOtrFile=None, portVer=None):
     if not asset_tool_exe:
