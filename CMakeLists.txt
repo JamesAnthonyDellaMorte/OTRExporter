@@ -85,7 +85,12 @@ if (NOT TARGET libultraship)
 endif()
 
 if (NOT TARGET ZAPD)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../ZAPDTR/ZAPD ${CMAKE_BINARY_DIR}/ZAPD)
+    set(OTR_ASSET_TOOL_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../ZAPDTR/ZAPD")
+    if (DEFINED BLUEFEATHER_ASSET_TOOL_SOURCE_DIR)
+        set(OTR_ASSET_TOOL_SOURCE_DIR "${BLUEFEATHER_ASSET_TOOL_SOURCE_DIR}")
+    endif()
+
+    add_subdirectory(${OTR_ASSET_TOOL_SOURCE_DIR} ${CMAKE_BINARY_DIR}/AssetTool)
 endif()
 
 add_subdirectory(OTRExporter)
